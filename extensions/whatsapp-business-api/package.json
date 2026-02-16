@@ -1,0 +1,10 @@
+{
+  "name": "@openclaw/whatsapp-business-api",
+  "version": "2026.2.15",
+  "private": true,
+  "description": "OpenClaw WhatsApp Business API integration via Maton",
+  "type": "module",
+  "devDependencies": {
+    "openclaw": "workspace:*"
+  }
+}

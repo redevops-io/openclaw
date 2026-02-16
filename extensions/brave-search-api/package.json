@@ -1,0 +1,10 @@
+{
+  "name": "@openclaw/brave-search-api",
+  "version": "2026.2.15",
+  "private": true,
+  "description": "OpenClaw Brave Search API integration",
+  "type": "module",
+  "devDependencies": {
+    "openclaw": "workspace:*"
+  }
+}

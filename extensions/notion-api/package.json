@@ -1,0 +1,10 @@
+{
+  "name": "@openclaw/notion-api",
+  "version": "2026.2.15",
+  "private": true,
+  "description": "OpenClaw Notion API integration",
+  "type": "module",
+  "devDependencies": {
+    "openclaw": "workspace:*"
+  }
+}
