@@ -1,0 +1,13 @@
+{
+  "id": "brave-search-api",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "apiKey": {
+        "type": "string",
+        "description": "Brave Search API key (overrides BRAVE_API_KEY env var)"
+      }
+    }
+  }
+}

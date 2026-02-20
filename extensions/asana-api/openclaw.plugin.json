@@ -1,0 +1,13 @@
+{
+  "id": "asana-api",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "apiKey": {
+        "type": "string",
+        "description": "Asana API key (overrides ASANA_API_KEY env var)"
+      }
+    }
+  }
+}

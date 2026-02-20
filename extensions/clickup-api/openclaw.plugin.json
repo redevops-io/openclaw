@@ -1,0 +1,13 @@
+{
+  "id": "clickup-api",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "apiKey": {
+        "type": "string",
+        "description": "ClickUp API key (overrides CLICKUP_API_KEY env var)"
+      }
+    }
+  }
+}
