@@ -243,7 +243,31 @@ importers:
         specifier: ^4.0.18
         version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.2.3)(@vitest/browser-playwright@4.0.18)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.2)
 
+  extensions/airtable-api:
+    devDependencies:
+      openclaw:
+        specifier: workspace:*
+        version: link:../..
+
+  extensions/asana-api:
+    devDependencies:
+      openclaw:
+        specifier: workspace:*
+        version: link:../..
+
   extensions/bluebubbles:
+    devDependencies:
+      openclaw:
+        specifier: workspace:*
+        version: link:../..
+
+  extensions/brave-search-api:
+    devDependencies:
+      openclaw:
+        specifier: workspace:*
+        version: link:../..
+
+  extensions/clickup-api:
     devDependencies:
       openclaw:
         specifier: workspace:*
@@ -463,6 +487,12 @@ importers:
         specifier: workspace:*
         version: link:../..
 
+  extensions/notion-api:
+    devDependencies:
+      openclaw:
+        specifier: workspace:*
+        version: link:../..
+
   extensions/open-prose:
     devDependencies:
       openclaw:
@@ -533,6 +563,12 @@ importers:
         version: link:../..
 
   extensions/whatsapp:
+    devDependencies:
+      openclaw:
+        specifier: workspace:*
+        version: link:../..
+
+  extensions/whatsapp-business-api:
     devDependencies:
       openclaw:
         specifier: workspace:*

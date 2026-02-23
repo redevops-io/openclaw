@@ -1,3 +1,13 @@
+# ---- helper stage: extract package.json files preserving directory structure ----
+FROM busybox:1.36 AS pkg-json
+WORKDIR /src
+COPY extensions/ extensions/
+COPY packages/ packages/
+# Keep only package.json files (and openclaw.plugin.json for manifest resolution)
+RUN find extensions packages -type f \! \( -name 'package.json' -o -name 'openclaw.plugin.json' \) -delete && \
+    find extensions packages -type d -empty -delete
+
+# ---- main build ----
 FROM node:22-bookworm
 
 # Install Bun (required for build scripts)
@@ -20,6 +30,13 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 COPY ui/package.json ./ui/package.json
 COPY patches ./patches
 COPY scripts ./scripts
+
+# Copy workspace member package.json (and plugin manifest) files so pnpm
+# resolves every workspace package (extensions/*, packages/*).  Without
+# these, pnpm install silently skips them and extensions never get linked,
+# causing "plugin manifest not found" at runtime.
+COPY --from=pkg-json /src/extensions/ ./extensions/
+COPY --from=pkg-json /src/packages/ ./packages/
 
 RUN pnpm install --frozen-lockfile
 
