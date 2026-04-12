@@ -161,6 +161,64 @@ describe("buildEmbeddedRunPayloads", () => {
     expect(payloads[0]?.text).toBe("All good");
   });
 
+  it("flags phantom messaging claims when no messaging tool send was recorded", () => {
+    const payloads = buildPayloads({
+      assistantTexts: ["I sent that message to Telegram."],
+      lastAssistant: makeAssistant({
+        stopReason: "stop",
+        errorMessage: undefined,
+        content: [{ type: "text", text: "I sent that message to Telegram." }],
+      }),
+      didSendViaMessagingTool: false,
+    });
+
+    expect(payloads.length).toBeGreaterThanOrEqual(1);
+    const warning = payloads.find((p) => p.isError && (p.text ?? "").includes("without actually"));
+    expect(warning).toBeDefined();
+  });
+
+  it("does not flag messaging claims when messaging tool send was recorded", () => {
+    const payloads = buildPayloads({
+      assistantTexts: ["I sent that message to Telegram."],
+      lastAssistant: makeAssistant({
+        stopReason: "stop",
+        errorMessage: undefined,
+        content: [{ type: "text", text: "I sent that message to Telegram." }],
+      }),
+      didSendViaMessagingTool: true,
+    });
+
+    const warning = payloads.find((p) => p.isError && (p.text ?? "").includes("without actually"));
+    expect(warning).toBeUndefined();
+  });
+
+  it("flags repeated tool loops when the same tool repeats without answer text", () => {
+    const payloads = buildPayloads({
+      assistantTexts: [],
+      toolMetas: [
+        { toolName: "knowledge_query" },
+        { toolName: "knowledge_query" },
+        { toolName: "knowledge_query" },
+        { toolName: "knowledge_query" },
+      ],
+      lastAssistant: makeAssistant({
+        stopReason: "toolUse",
+        errorMessage: undefined,
+        content: [
+          {
+            type: "toolCall",
+            id: "toolu_loop",
+            name: "knowledge_query",
+            arguments: { q: "same" },
+          },
+        ],
+      }),
+    });
+
+    const warning = payloads.find((p) => p.isError && (p.text ?? "").includes("tool-call loop"));
+    expect(warning).toBeDefined();
+  });
+
   it("adds tool error fallback when the assistant only invoked tools", () => {
     const payloads = buildPayloads({
       lastAssistant: makeAssistant({
