@@ -29,6 +29,10 @@ type LastToolError = {
   actionFingerprint?: string;
 };
 
+const PHANTOM_MESSAGING_CLAIM_RE =
+  /\b(i\s+(have\s+)?sent|sent\s+(it|that|the\s+message)|posted\s+(it|that)|delivered\s+(it|that))\b/i;
+const MESSAGING_CHANNEL_HINT_RE = /\b(telegram|slack|discord|whatsapp|channel|chat)\b/i;
+
 const RECOVERABLE_TOOL_ERROR_KEYWORDS = [
   "required",
   "missing",
@@ -60,6 +64,32 @@ function shouldShowToolErrorWarning(params: {
   return !params.hasUserFacingReply && !isRecoverableToolError(params.lastToolError.error);
 }
 
+function looksLikePhantomMessagingClaim(text: string): boolean {
+  const normalized = text.trim();
+  if (!normalized) {
+    return false;
+  }
+  return PHANTOM_MESSAGING_CLAIM_RE.test(normalized) && MESSAGING_CHANNEL_HINT_RE.test(normalized);
+}
+
+function detectRepeatedToolLoop(params: {
+  toolMetas: ToolMetaEntry[];
+  answerTexts: string[];
+  lastAssistant: AssistantMessage | undefined;
+}): boolean {
+  if (params.answerTexts.length > 0) {
+    return false;
+  }
+  if (params.lastAssistant?.stopReason !== "toolUse") {
+    return false;
+  }
+  if (params.toolMetas.length < 4) {
+    return false;
+  }
+  const uniqueTools = new Set(params.toolMetas.map((m) => m.toolName));
+  return uniqueTools.size === 1;
+}
+
 export function buildEmbeddedRunPayloads(params: {
   assistantTexts: string[];
   toolMetas: ToolMetaEntry[];
@@ -72,6 +102,7 @@ export function buildEmbeddedRunPayloads(params: {
   reasoningLevel?: ReasoningLevel;
   toolResultFormat?: ToolResultFormat;
   inlineToolResultsAllowed: boolean;
+  didSendViaMessagingTool?: boolean;
 }): Array<{
   text?: string;
   mediaUrl?: string;
@@ -217,6 +248,33 @@ export function buildEmbeddedRunPayloads(params: {
         ? [fallbackAnswerText]
         : []
   ).filter((text) => !shouldSuppressRawErrorText(text));
+
+  if (
+    !params.didSendViaMessagingTool &&
+    answerTexts.some((text) => looksLikePhantomMessagingClaim(text))
+  ) {
+    replyItems.push({
+      text:
+        "I may have described a message send action without actually executing a messaging tool call. " +
+        "Please retry and explicitly invoke the relevant messaging tool.",
+      isError: true,
+    });
+  }
+
+  if (
+    detectRepeatedToolLoop({
+      toolMetas: params.toolMetas,
+      answerTexts,
+      lastAssistant: params.lastAssistant,
+    })
+  ) {
+    replyItems.push({
+      text:
+        "The agent appears stuck in a repeated tool-call loop. " +
+        "Please rephrase the request or add more specific constraints.",
+      isError: true,
+    });
+  }
 
   for (const text of answerTexts) {
     const {

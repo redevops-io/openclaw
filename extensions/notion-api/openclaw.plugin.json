@@ -1,0 +1,13 @@
+{
+  "id": "notion-api",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "apiKey": {
+        "type": "string",
+        "description": "Notion API key (overrides NOTION_API_KEY env var)"
+      }
+    }
+  }
+}

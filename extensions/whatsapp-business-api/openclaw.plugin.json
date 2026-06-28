@@ -1,0 +1,17 @@
+{
+  "id": "whatsapp-business-api",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "apiToken": {
+        "type": "string",
+        "description": "WhatsApp Business API token (overrides WHATSAPP_API_TOKEN env var)"
+      },
+      "phoneNumberId": {
+        "type": "string",
+        "description": "WhatsApp phone number ID (overrides WHATSAPP_PHONE_NUMBER_ID env var)"
+      }
+    }
+  }
+}

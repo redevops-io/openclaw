@@ -1,0 +1,13 @@
+{
+  "id": "airtable-api",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "apiKey": {
+        "type": "string",
+        "description": "Airtable API key (overrides AIRTABLE_API_KEY env var)"
+      }
+    }
+  }
+}

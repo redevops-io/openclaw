@@ -59,6 +59,62 @@ function describeToolExecutionError(err: unknown): {
   return { message: String(err) };
 }
 
+/**
+ * Stringify a tool payload for embedding into a text content block.
+ */
+function stringifyToolPayload(payload: unknown): string {
+  if (typeof payload === "string") {
+    return payload;
+  }
+  try {
+    const encoded = JSON.stringify(payload, null, 2);
+    return encoded === undefined ? String(payload) : encoded;
+  } catch {
+    return String(payload);
+  }
+}
+
+/**
+ * Normalize non-standard plugin tool results so they always have the
+ * expected `{ content: [{ type: "text", text: "..." }] }` shape.
+ *
+ * Some plugins (e.g. rag-knowledge, tesseramemo) return plain objects
+ * without the `content` array, which causes downstream `.filter()`
+ * calls to crash with "Cannot read properties of undefined".
+ *
+ * Upstream fix: openclaw/openclaw#27007 (commit 8a97803)
+ */
+function normalizeToolExecutionResult(params: {
+  toolName: string;
+  result: AgentToolResult<unknown>;
+}): AgentToolResult<unknown> {
+  const { toolName, result } = params;
+  if (result == null) {
+    return jsonResult({ status: "ok", tool: toolName });
+  }
+  // Already has content[] — nothing to do.
+  if (
+    typeof result === "object" &&
+    "content" in result &&
+    Array.isArray((result as { content?: unknown }).content)
+  ) {
+    return result;
+  }
+  // Non-standard shape — coerce into a proper tool result.
+  const record = typeof result === "object" ? (result as unknown as Record<string, unknown>) : {};
+  logDebug(`[tools] ${toolName} returned non-standard result (missing content[]); coercing`);
+  const details = "details" in record ? record.details : record;
+  const safeDetails = details ?? { status: "ok", tool: toolName };
+  return {
+    content: [
+      {
+        type: "text",
+        text: stringifyToolPayload(safeDetails),
+      },
+    ],
+  } as AgentToolResult<unknown>;
+}
+
 function splitToolExecuteArgs(args: ToolExecuteArgsAny): {
   toolCallId: string;
   params: unknown;
@@ -108,7 +164,11 @@ export function toToolDefinitions(tools: AnyAgentTool[]): ToolDefinition[] {
             }
             executeParams = hookOutcome.params;
           }
-          const result = await tool.execute(toolCallId, executeParams, signal, onUpdate);
+          const rawResult = await tool.execute(toolCallId, executeParams, signal, onUpdate);
+          const result = normalizeToolExecutionResult({
+            toolName: normalizedName,
+            result: rawResult,
+          });
           const afterParams = beforeHookWrapped
             ? (consumeAdjustedParamsForToolCall(toolCallId) ?? executeParams)
             : executeParams;

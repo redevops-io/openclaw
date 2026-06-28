@@ -1,0 +1,23 @@
+{
+  "id": "rag-knowledge",
+  "name": "RAG Knowledge Base",
+  "description": "Search and manage your workspace knowledge base — documents, Telegram history, web sources.",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "backendUrl": {
+        "type": "string",
+        "description": "Backend writer API URL (default: from RAG_BACKEND_URL env var)"
+      },
+      "workspaceId": {
+        "type": "string",
+        "description": "Workspace UUID (default: from WORKSPACE_ID env var)"
+      },
+      "internalToken": {
+        "type": "string",
+        "description": "Internal API token for backend auth (default: from OPENCLAW_GATEWAY_TOKEN env var)"
+      }
+    }
+  }
+}

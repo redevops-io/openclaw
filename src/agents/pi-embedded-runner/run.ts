@@ -922,6 +922,7 @@ export async function runEmbeddedPiAgent(
             reasoningLevel: params.reasoningLevel,
             toolResultFormat: resolvedToolResultFormat,
             inlineToolResultsAllowed: false,
+            didSendViaMessagingTool: attempt.didSendViaMessagingTool,
           });
 
           // Timeout aborts can leave the run without any assistant payloads.
