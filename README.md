@@ -1,3 +1,6 @@
+> **Fork notice.** This is a ReDevOps fork of [openclaw/openclaw](https://github.com/openclaw/openclaw) based on upstream commit `39d5590` (2026-02-16). Local delta: 8 commits (46 files, +3466/-2): Maton-based SaaS tool extensions, a `rag-knowledge` extension, and agent tool-loop/payload fixes; see [FORK_README.md](FORK_README.md) and [INTEGRATION_SUMMARY.md](INTEGRATION_SUMMARY.md). The Maton extensions require a third-party [maton.ai](https://maton.ai/) API key.
+> Sync status on 2026-10-15: 8 ahead, 100,519 behind upstream `main`. Everything below is upstream's README; versions, tags and links are inherited and may not reflect this fork. See [PROVENANCE.md](PROVENANCE.md). Licence: MIT retained.
+
 # 🦞 OpenClaw — Personal AI Assistant
 
 <p align="center">
