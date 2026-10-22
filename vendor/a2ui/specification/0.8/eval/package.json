@@ -32,5 +32,14 @@
     "@genkit-ai/vertexai": "^1.19.3",
     "genkit": "^1.19.2",
     "genkitx-anthropic": "^0.25.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "fast-xml-parser": "5.3.5",
+      "handlebars": "4.7.10",
+      "proxy-addr": "2.0.8",
+      "websocket-driver": "0.7.5",
+      "protobufjs@7": "7.5.5"
+    }
   }
 }
